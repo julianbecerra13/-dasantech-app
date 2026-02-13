@@ -10,15 +10,22 @@ import { auth, db } from "./firebase";
 
 export async function registerUser(email: string, password: string, name: string) {
   const firebaseAuth = auth();
-  const firebaseDb = db();
-  if (!firebaseAuth || !firebaseDb) throw new Error("Firebase no inicializado");
+  if (!firebaseAuth) throw new Error("Firebase no inicializado");
   const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
   await updateProfile(userCredential.user, { displayName: name });
-  await setDoc(doc(firebaseDb, "users", userCredential.user.uid), {
-    name,
-    email,
-    createdAt: new Date().toISOString(),
-  });
+  // Guardar datos extra en Firestore (no bloquea el registro si falla)
+  try {
+    const firebaseDb = db();
+    if (firebaseDb) {
+      await setDoc(doc(firebaseDb, "users", userCredential.user.uid), {
+        name,
+        email,
+        createdAt: new Date().toISOString(),
+      });
+    }
+  } catch (e) {
+    console.warn("No se pudo guardar en Firestore:", e);
+  }
   return userCredential.user;
 }
 
