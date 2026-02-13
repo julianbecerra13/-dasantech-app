@@ -3,12 +3,12 @@ import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDRjPuGk_WZyYVE2uqVlshT-suSrkFhoik",
+  authDomain: "dasantech-app.firebaseapp.com",
+  projectId: "dasantech-app",
+  storageBucket: "dasantech-app.firebasestorage.app",
+  messagingSenderId: "1087937676128",
+  appId: "1:1087937676128:web:1c441793edfa5cc895d405",
 };
 
 let app: FirebaseApp | undefined;
@@ -17,7 +17,6 @@ let db: Firestore | undefined;
 
 function getFirebaseApp() {
   if (typeof window === "undefined") return undefined;
-  if (!firebaseConfig.apiKey) return undefined;
   if (!app) {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   }
