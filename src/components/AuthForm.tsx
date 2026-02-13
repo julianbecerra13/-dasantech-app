@@ -39,9 +39,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
         "auth/invalid-email": "Correo electronico invalido",
         "auth/invalid-credential": "Credenciales incorrectas",
       };
+      const message = errorMessages[firebaseError.code || ""];
       setError(
-        errorMessages[firebaseError.code || ""] ||
-          "Ocurrio un error. Intenta de nuevo."
+        message || `Error: ${firebaseError.code || (err as Error).message || "desconocido"}`
       );
     } finally {
       setLoading(false);
