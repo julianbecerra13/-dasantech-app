@@ -8,11 +8,13 @@ import { Package, Clock } from "lucide-react";
 interface Product {
   title: string;
   price: string;
+  originalPrice?: string;
+  discount?: string;
   currency: string;
   image: string;
   link: string;
-  seller: string;
-  freeShipping: boolean;
+  brand?: string;
+  specs?: string[];
 }
 
 interface ScrapingResult {
@@ -59,7 +61,7 @@ export default function ScrapingPage() {
           Web <span className="gradient-text">Scraping</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Demo de scraping en tiempo real sobre MercadoLibre Colombia
+          Demo de scraping en tiempo real sobre Falabella Colombia
         </p>
       </div>
 

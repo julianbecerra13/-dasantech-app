@@ -14,22 +14,21 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `https://listado.mercadolibre.com.co/${encodeURIComponent(query)}`;
+    const url = `https://www.falabella.com.co/falabella-co/search?Ntt=${encodeURIComponent(query)}`;
 
     const response = await fetch(url, {
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "es-CO,es;q=0.9",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept-Language": "es-CO,es;q=0.9,en;q=0.8",
         Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
-      next: { revalidate: 300 },
     });
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: "Error al consultar MercadoLibre", status: response.status },
+        { error: "Error al consultar Falabella", status: response.status },
         { status: 502 }
       );
     }
@@ -40,62 +39,84 @@ export async function GET(request: NextRequest) {
     interface Product {
       title: string;
       price: string;
+      originalPrice: string;
+      discount: string;
       currency: string;
       image: string;
       link: string;
-      seller: string;
-      freeShipping: boolean;
+      brand: string;
+      specs: string[];
     }
 
     const products: Product[] = [];
 
-    $(".ui-search-layout__item").each((_, element) => {
-      if (products.length >= limit) return false;
+    // Extract data from Next.js __NEXT_DATA__ JSON
+    const nextDataScript = $("#__NEXT_DATA__").html();
+    if (nextDataScript) {
+      try {
+        const nextData = JSON.parse(nextDataScript);
+        const results = nextData?.props?.pageProps?.results || [];
 
-      const el = $(element);
-      const title =
-        el.find(".ui-search-item__title").text().trim() ||
-        el.find(".poly-component__title").text().trim();
-      const priceWhole =
-        el.find(".andes-money-amount__fraction").first().text().trim();
-      const currency =
-        el.find(".andes-money-amount__currency-symbol").first().text().trim() ||
-        "$";
-      const image =
-        el.find("img").attr("data-src") ||
-        el.find("img").attr("src") ||
-        "";
-      const link =
-        el.find("a.ui-search-link").attr("href") ||
-        el.find("a.poly-component__title").attr("href") ||
-        el.find("a").first().attr("href") ||
-        "";
-      const seller =
-        el.find(".ui-search-official-store-label").text().trim() ||
-        el.find(".poly-component__seller").text().trim() ||
-        "Vendedor";
-      const freeShipping =
-        el.find(".ui-search-item__shipping--free").length > 0 ||
-        el.text().toLowerCase().includes("envío gratis");
+        for (const item of results) {
+          if (products.length >= limit) break;
 
-      if (title && priceWhole) {
-        products.push({
-          title,
-          price: priceWhole,
-          currency,
-          image,
-          link,
-          seller,
-          freeShipping,
-        });
+          const prices = item.prices || [];
+          const eventPrice = prices.find((p: { type: string }) => p.type === "eventPrice");
+          const normalPrice = prices.find((p: { type: string }) => p.type === "normalPrice");
+          const mainPrice = eventPrice || normalPrice || prices[0];
+
+          products.push({
+            title: item.displayName || "",
+            price: mainPrice?.price?.[0] || "0",
+            originalPrice: normalPrice?.price?.[0] || "",
+            discount: item.discountBadge?.label || "",
+            currency: mainPrice?.symbol?.trim() || "$",
+            image: item.mediaUrls?.[0] ? `${item.mediaUrls[0]}?w=400` : "",
+            link: item.url || "",
+            brand: item.brand || "",
+            specs: (item.topSpecifications || []).slice(0, 3),
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing __NEXT_DATA__:", e);
       }
-    });
+    }
+
+    // Fallback: parse HTML if no JSON data found
+    if (products.length === 0) {
+      $("[data-pod]").each((_, element) => {
+        if (products.length >= limit) return false;
+
+        const el = $(element);
+        const title = el.find("[class*=displayName]").text().trim() ||
+          el.find("b.pod-title").text().trim() ||
+          el.find("a").attr("title") || "";
+        const price = el.find("[class*=Price]").first().text().trim();
+        const image = el.find("img").attr("src") || "";
+        const link = el.find("a").attr("href") || "";
+        const brand = el.find("[class*=brand]").text().trim();
+
+        if (title) {
+          products.push({
+            title,
+            price,
+            originalPrice: "",
+            discount: "",
+            currency: "$",
+            image,
+            link: link.startsWith("http") ? link : `https://www.falabella.com.co${link}`,
+            brand,
+            specs: [],
+          });
+        }
+      });
+    }
 
     return NextResponse.json({
       query,
       total: products.length,
       products,
-      source: "MercadoLibre Colombia",
+      source: "Falabella Colombia",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

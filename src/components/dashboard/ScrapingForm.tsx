@@ -75,7 +75,7 @@ export default function ScrapingForm({ onSearch, loading }: ScrapingFormProps) {
           ) : (
             <>
               <Search size={16} />
-              Buscar en MercadoLibre
+              Buscar en Falabella
             </>
           )}
         </button>
@@ -100,8 +100,8 @@ export default function ScrapingForm({ onSearch, loading }: ScrapingFormProps) {
       <div className="mt-4 flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
         <AlertCircle size={14} className="shrink-0 mt-0.5" />
         <p>
-          Este demo realiza web scraping en tiempo real sobre MercadoLibre Colombia
-          usando Cheerio. Los resultados pueden variar segun disponibilidad del sitio.
+          Este demo realiza web scraping en tiempo real sobre Falabella Colombia
+          usando Cheerio para parsear el HTML. Los resultados pueden variar segun disponibilidad del sitio.
         </p>
       </div>
     </div>

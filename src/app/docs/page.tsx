@@ -94,16 +94,18 @@ export default function DocsPage() {
   "total": 20,
   "products": [
     {
-      "title": "Laptop Gaming ASUS ROG Strix...",
-      "price": "4.500.000",
+      "title": "Portatil Vivobook Ryzen 3 8GB 512GB",
+      "price": "1.239.000",
+      "originalPrice": "1.999.000",
+      "discount": "-40%",
       "currency": "$",
-      "image": "https://...",
-      "link": "https://articulo.mercadolibre.com.co/...",
-      "seller": "Tienda Oficial ASUS",
-      "freeShipping": true
+      "image": "https://media.falabella.com.co/...",
+      "link": "https://www.falabella.com.co/...",
+      "brand": "ASUS",
+      "specs": ["Pantalla: 15.6", "RAM: 8GB", "SSD: 512GB"]
     }
   ],
-  "source": "MercadoLibre Colombia",
+  "source": "Falabella Colombia",
   "timestamp": "2026-02-12T..."
 }`;
 
@@ -158,8 +160,8 @@ export default function DocsPage() {
                 <code className="font-mono text-sm">/api/scrape</code>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Realiza web scraping en tiempo real sobre MercadoLibre Colombia.
-                Retorna una lista de productos con nombre, precio, imagen, enlace y vendedor.
+                Realiza web scraping en tiempo real sobre Falabella Colombia usando Cheerio.
+                Retorna productos con nombre, precio, descuento, marca, imagen y especificaciones.
               </p>
 
               <h3 className="text-sm font-semibold mb-2">Parametros (query string)</h3>
